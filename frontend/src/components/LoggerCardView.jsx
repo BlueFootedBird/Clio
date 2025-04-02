@@ -1,6 +1,6 @@
 // frontend/src/components/LoggerCardView.jsx
 import React, { useState, useEffect } from 'react';
-import { Layout, List, Plus, Filter, AlertCircle, FileText, Check } from 'lucide-react';
+import { Layout, List, Plus, Filter, AlertCircle, FileText, Check, ChevronDown } from 'lucide-react';
 import LogRowCard from './LogRowCard';
 import Pagination from './Pagination';
 import DateRangeFilter from './DateRangeFilter';
@@ -15,7 +15,11 @@ const LoggerCardView = ({
   currentUser,
   tableState,
   handlers,
-  csrfToken
+  csrfToken,
+  setDisplayMAC,
+  setDisplayIP,
+  displayMAC,
+  displayIP
 }) => {
   const [viewMode, setViewMode] = useState('card');
   const [filteredLogs, setFilteredLogs] = useState(logs);
@@ -23,7 +27,8 @@ const LoggerCardView = ({
   const [searchFilter, setSearchFilter] = useState({ query: '', field: 'all' });
   const [hasActiveFilters, setHasActiveFilters] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false); // State for templates visibility
-  
+  const [dropdownOpen, setDropdownOpen] = useState(false); // State for toggle display values
+
   // Updated for multi-select
   const [selectedCardForSave, setSelectedCardForSave] = useState(null); // Single card for saving as template
   const [selectedCardsForMerge, setSelectedCardsForMerge] = useState([]); // Multiple cards for merging with template
@@ -260,6 +265,45 @@ const LoggerCardView = ({
             <FileText size={16} />
             <span className="hidden sm:inline">Templates</span>
           </button>
+
+          {/* Toggle Button */}
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="px-3 py-1.5 rounded-md flex items-center gap-2 transition-colors duration-200 bg-gray-700 text-gray-300 hover:bg-gray-600"
+            title="Toggle Options"
+          >
+            Toggle Values
+            <ChevronDown size={16} />
+          </button>
+    
+          {/* Dropdown Menu */}
+          {dropdownOpen && (
+            <div className="absolute left-0 mt-2 w-40 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+              <div className="py-2">
+                {/* Toggle MAC */}
+                <label className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={displayMAC}
+                    onChange={() => setDisplayMAC((prev) => !prev)}
+                    className="mr-2"
+                  />
+                  Show MAC
+                </label>
+    
+                {/* Toggle IP */}
+                <label className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={displayIP}
+                    onChange={() => setDisplayIP((prev) => !prev)}
+                    className="mr-2"
+                  />
+                  Show IP
+                </label>
+              </div>
+            </div>
+          )}
           
           {/* NEW: Show count of selected cards when in merge mode */}
           {templateMode === 'merge' && selectedCardsForMerge.length > 0 && (
