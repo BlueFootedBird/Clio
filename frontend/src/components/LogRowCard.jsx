@@ -4,6 +4,8 @@ import { ChevronRight, ChevronDown, Lock, Unlock, Trash2, Eye, EyeOff, FileText 
 import { COLUMNS } from '../utils/constants';
 import EvidenceTab from './EvidenceTab';
 import { handleMacAddressInput, formatMacAddress } from '../utils/macAddressUtils';
+import LoggerCardView from "./LoggerCardView";
+
 
 // Helper function to get status color class
 const getStatusColorClass = (status) => {
@@ -40,6 +42,16 @@ const LogRowCard = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSecrets, setShowSecrets] = useState(false);
   const [showEvidenceTab, setShowEvidenceTab] = useState(false);
+  const [displayMAC, setDisplayMAC] = useState(true);
+  const [displayIP, setDisplayIP] = useState(true);
+
+  //Passing from parent
+  <LoggerCardView 
+  displayMAC={displayMAC} 
+  setDisplayMAC={setDisplayMAC} 
+  displayIP={displayIP} 
+  setDisplayIP={setDisplayIP} 
+  />
   
   // Row is only editable if it's not locked
   const canEdit = !row.locked;
@@ -456,13 +468,13 @@ const LogRowCard = ({
           </div>
           
           <div className="flex items-center ml-4 gap-x-4 overflow-hidden">
-            {row.internal_ip && (
+            {row.internal_ip && displayIP (
               <div className="flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs text-blue-300 whitespace-nowrap font-medium">
                 IP: {row.internal_ip}
               </div>
             )}
             
-            {row.mac_address && (
+            {row.mac_address && displayMAC (
               <div className="flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs text-cyan-300 whitespace-nowrap font-medium">
                 MAC: {formatMacAddress(row.mac_address)}
               </div>
