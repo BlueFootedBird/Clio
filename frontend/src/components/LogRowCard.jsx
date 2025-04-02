@@ -4,7 +4,7 @@ import { ChevronRight, ChevronDown, Lock, Unlock, Trash2, Eye, EyeOff, FileText 
 import { COLUMNS } from '../utils/constants';
 import EvidenceTab from './EvidenceTab';
 import { handleMacAddressInput, formatMacAddress } from '../utils/macAddressUtils';
-import LoggerCardView from "./LoggerCardView";
+import LoggerCardView from './LoggerCardView';
 
 
 // Helper function to get status color class
@@ -37,21 +37,13 @@ const LogRowCard = ({
   onExpand,
   onToggleLock,
   onDelete,
-  csrfToken
+  csrfToken,
+  selected
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSecrets, setShowSecrets] = useState(false);
   const [showEvidenceTab, setShowEvidenceTab] = useState(false);
-  const [displayMAC, setDisplayMAC] = useState(true);
-  const [displayIP, setDisplayIP] = useState(true);
 
-  //Passing from parent
-  <LoggerCardView 
-  displayMAC={displayMAC} 
-  setDisplayMAC={setDisplayMAC} 
-  displayIP={displayIP} 
-  setDisplayIP={setDisplayIP} 
-  />
   
   // Row is only editable if it's not locked
   const canEdit = !row.locked;
@@ -468,50 +460,49 @@ const LogRowCard = ({
           </div>
           
           <div className="flex items-center ml-4 gap-x-4 overflow-hidden">
-            {row.internal_ip && displayIP (
+            {row.internal_ip && selected.InternalIP && (
               <div className="flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs text-blue-300 whitespace-nowrap font-medium">
                 IP: {row.internal_ip}
               </div>
             )}
-            
-            {row.mac_address && displayMAC (
+            {row.mac_address && selected.MAC && (
               <div className="flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs text-cyan-300 whitespace-nowrap font-medium">
                 MAC: {formatMacAddress(row.mac_address)}
               </div>
             )}
             
             {/* Add PID display here, right after the MAC address display */}
-            {row.pid && (
+            {row.pid && selected.PID && (
               <div className="flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs text-cyan-300 whitespace-nowrap font-medium">
                 PID: {row.pid}
               </div>
             )}
             
-            {row.hostname && (
+            {row.hostname && selected.Hostname && (
               <div className="flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs text-white whitespace-nowrap font-medium">
                 Host: {row.hostname}
               </div>
             )}
             
-            {row.username && (
+            {row.username && selected.Username && (
               <div className="flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs text-green-300 whitespace-nowrap font-medium">
                 User: {row.username}
               </div>
             )}
             
-            {row.filename && (
+            {row.filename && selected.Filename && (
               <div className="hidden md:block flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs text-purple-300 whitespace-nowrap font-medium">
                 File: {row.filename}
               </div>
             )}
             
-            {row.command && (
+            {row.command && selected.Command && (
               <div className="hidden lg:block flex-shrink-0 text-sm text-yellow-300 truncate max-w-xs font-medium">
                 Cmd: {row.command}
               </div>
             )}
             
-            {row.status && (
+            {row.status && selected.Status && (
               <div className="flex-shrink-0 px-2 py-1 bg-gray-700 rounded text-xs whitespace-nowrap font-bold">
                 <span className={`${getStatusColorClass(row.status)}`}>{row.status}</span>
               </div>

@@ -15,11 +15,7 @@ const LoggerCardView = ({
   currentUser,
   tableState,
   handlers,
-  csrfToken,
-  setDisplayMAC,
-  setDisplayIP,
-  displayMAC,
-  displayIP
+  csrfToken
 }) => {
   const [viewMode, setViewMode] = useState('card');
   const [filteredLogs, setFilteredLogs] = useState(logs);
@@ -27,14 +23,19 @@ const LoggerCardView = ({
   const [searchFilter, setSearchFilter] = useState({ query: '', field: 'all' });
   const [hasActiveFilters, setHasActiveFilters] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false); // State for templates visibility
-  const [dropdownOpen, setDropdownOpen] = useState(false); // State for toggle display values
 
+  // For toggling visible values
+  const options = ["InternalIP", "MAC", "PID", "Hostname", "Username", "Filename", "Command", "Status"];
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selected, setSelected] = useState(Object.fromEntries(options.map(option => [option, true])));
+  
   // Updated for multi-select
   const [selectedCardForSave, setSelectedCardForSave] = useState(null); // Single card for saving as template
   const [selectedCardsForMerge, setSelectedCardsForMerge] = useState([]); // Multiple cards for merging with template
   
   const [templateMode, setTemplateMode] = useState(null);
   
+
   // Apply filters whenever logs, dateRange, or searchFilter changes
   useEffect(() => {
     // Start with all logs
@@ -106,7 +107,8 @@ const LoggerCardView = ({
     setDateRange({ start: null, end: null });
     setSearchFilter({ query: '', field: 'all' });
   };
-  
+
+
   // Handle selecting a card for saving as template (still single selection)
   const handleSelectCardForSave = (rowId, event) => {
     event.stopPropagation();
@@ -234,6 +236,7 @@ const LoggerCardView = ({
     return [];
   };
   
+
   return (
     <div className="bg-gray-800 shadow-lg rounded-lg w-full">
       {/* Header */}
@@ -266,44 +269,35 @@ const LoggerCardView = ({
             <span className="hidden sm:inline">Templates</span>
           </button>
 
-          {/* Toggle Button */}
-          <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="px-3 py-1.5 rounded-md flex items-center gap-2 transition-colors duration-200 bg-gray-700 text-gray-300 hover:bg-gray-600"
-            title="Toggle Options"
-          >
-            Toggle Values
-            <ChevronDown size={16} />
-          </button>
-    
-          {/* Dropdown Menu */}
-          {dropdownOpen && (
-            <div className="absolute left-0 mt-2 w-40 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
-              <div className="py-2">
-                {/* Toggle MAC */}
-                <label className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer">
+          {/* Centers dropdown */}
+          <div className="relative inline-block">
+            {/* Toggle Button */}
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="px-3 py-1.5 rounded-md flex items-center gap-2 transition-colors duration-200 bg-gray-700 text-gray-300 hover:bg-gray-600"
+              title="Toggle Options"
+            >
+              Toggle Values
+              <ChevronDown size={16} />
+            </button>
+
+            {/* Dropdown Menu Options */}
+            {dropdownOpen && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+              {options.map((option) => (
+                <label key={option} className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={displayMAC}
-                    onChange={() => setDisplayMAC((prev) => !prev)}
-                    className="mr-2"
+                    checked={selected[option] || false}
+                    onChange={() => setSelected((prev) => ({ ...prev, [option]: !prev[option] }))}
+                    className="mr-2 accent-blue-500"
                   />
-                  Show MAC
+                  {option}
                 </label>
-    
-                {/* Toggle IP */}
-                <label className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={displayIP}
-                    onChange={() => setDisplayIP((prev) => !prev)}
-                    className="mr-2"
-                  />
-                  Show IP
-                </label>
-              </div>
+              ))}
             </div>
           )}
+          </div>
           
           {/* NEW: Show count of selected cards when in merge mode */}
           {templateMode === 'merge' && selectedCardsForMerge.length > 0 && (
@@ -448,6 +442,7 @@ const LoggerCardView = ({
                   onToggleLock={handlers.handleToggleLock}
                   onDelete={handlers.handleDeleteRow}
                   csrfToken={csrfToken}
+                  selected={selected}
                 />
               </div>
             ))}
